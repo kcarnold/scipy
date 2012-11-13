@@ -1,5 +1,6 @@
 # Original Author: Travis Oliphant 2002
 # Bug-fixes in 2006 by Tim Leslie
+# Bug-fixes in 2012 by Esteban Martinez
 
 
 import numpy
@@ -392,8 +393,12 @@ def _minimize_anneal(func, x0, args=(),
             current_state.cost = func(current_state.x,*args)
             schedule.feval += 1
 
+            #Checks that the new state satisfies the bounds.
+            in_range = all(current_state.x > lower) and \
+                all(current_state.x < upper)
+
             dE = current_state.cost - last_state.cost
-            if schedule.accept_test(dE):
+            if in_range and schedule.accept_test(dE):
                 last_state.x = current_state.x.copy()
                 last_state.cost = current_state.cost
                 if last_state.cost < best_state.cost:
